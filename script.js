@@ -1,7 +1,8 @@
 const STORAGE_KEY = "miniTodoApp.tasks";
+const FILTER_STORAGE_KEY = "miniTodoApp.filter";
 
-const APP_VERSION = "0.1.0";
-const RELEASE_DATE = "2026-02-25 10:30"; // bei Änderungen manuell anpassen
+const APP_VERSION = "0.2.0";
+const RELEASE_DATE = "2026-02-25 11:15"; // bei Änderungen manuell anpassen
 
 const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
@@ -11,11 +12,14 @@ const emptyState = document.getElementById("empty-state");
 const errorMessage = document.getElementById("error-message");
 const clearDoneBtn = document.getElementById("clear-done-btn");
 const versionInfo = document.getElementById("app-version-info");
+const filterButtons = document.querySelectorAll(".filter-btn");
 
 let tasks = loadTasks();
+let currentFilter = loadFilter();
 
 render();
 renderVersionInfo();
+updateFilterButtons();
 
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -50,18 +54,15 @@ taskList.addEventListener("click", (event) => {
 
   const taskId = taskItem.dataset.taskId;
 
-  // Löschen
   if (target.classList.contains("delete-btn")) {
     tasks = tasks.filter((task) => task.id !== taskId);
     saveTasks();
     render();
-    return;
   }
 });
 
 taskList.addEventListener("change", (event) => {
   const target = event.target;
-
   if (!target.classList.contains("task-checkbox")) return;
 
   const taskItem = target.closest("[data-task-id]");
@@ -69,7 +70,6 @@ taskList.addEventListener("change", (event) => {
 
   const taskId = taskItem.dataset.taskId;
   const task = tasks.find((t) => t.id === taskId);
-
   if (!task) return;
 
   task.done = target.checked;
@@ -83,16 +83,31 @@ clearDoneBtn.addEventListener("click", () => {
   render();
 });
 
+filterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const nextFilter = button.dataset.filter;
+    if (!isValidFilter(nextFilter)) return;
+
+    currentFilter = nextFilter;
+    saveFilter();
+    updateFilterButtons();
+    render();
+  });
+});
+
 function render() {
   taskList.innerHTML = "";
 
-  if (tasks.length === 0) {
+  const visibleTasks = getVisibleTasks();
+
+  if (visibleTasks.length === 0) {
     emptyState.classList.remove("hidden");
+    emptyState.textContent = getEmptyStateText();
   } else {
     emptyState.classList.add("hidden");
   }
 
-  for (const task of tasks) {
+  for (const task of visibleTasks) {
     const li = document.createElement("li");
     li.className = `task-item ${task.done ? "done" : ""}`;
     li.dataset.taskId = task.id;
@@ -114,6 +129,42 @@ function render() {
   updateProgress();
 }
 
+function getVisibleTasks() {
+  if (currentFilter === "open") {
+    return tasks.filter((task) => !task.done);
+  }
+
+  if (currentFilter === "done") {
+    return tasks.filter((task) => task.done);
+  }
+
+  return tasks;
+}
+
+function getEmptyStateText() {
+  if (tasks.length === 0) {
+    return "Noch keine Aufgaben. Starte mit deiner ersten ✨";
+  }
+
+  if (currentFilter === "open") {
+    return "Keine offenen Aufgaben 🎉";
+  }
+
+  if (currentFilter === "done") {
+    return "Noch keine erledigten Aufgaben.";
+  }
+
+  return "Keine Aufgaben gefunden.";
+}
+
+function updateFilterButtons() {
+  filterButtons.forEach((button) => {
+    const isActive = button.dataset.filter === currentFilter;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
 function updateProgress() {
   const doneCount = tasks.filter((task) => task.done).length;
   progressText.textContent = `${doneCount} von ${tasks.length} erledigt`;
@@ -125,12 +176,10 @@ function saveTasks() {
 
 function loadTasks() {
   const raw = localStorage.getItem(STORAGE_KEY);
-
   if (!raw) return [];
 
   try {
     const parsed = JSON.parse(raw);
-
     if (!Array.isArray(parsed)) return [];
 
     return parsed.filter(
@@ -142,6 +191,19 @@ function loadTasks() {
   } catch {
     return [];
   }
+}
+
+function saveFilter() {
+  localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
+}
+
+function loadFilter() {
+  const raw = localStorage.getItem(FILTER_STORAGE_KEY);
+  return isValidFilter(raw) ? raw : "all";
+}
+
+function isValidFilter(value) {
+  return value === "all" || value === "open" || value === "done";
 }
 
 function createId() {
