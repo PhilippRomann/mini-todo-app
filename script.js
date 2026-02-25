@@ -1,8 +1,14 @@
 const STORAGE_KEY = "miniTodoApp.tasks";
 const FILTER_STORAGE_KEY = "miniTodoApp.filter";
 
-const APP_VERSION = "0.2.0";
-const RELEASE_DATE = "2026-02-25 11:15"; // bei Änderungen manuell anpassen
+const APP_VERSION = "0.2.1";
+const RELEASE_DATE = "2026-02-25 11:35"; // bei Änderungen manuell anpassen
+
+const FILTER_LABELS = {
+  all: "Alle",
+  open: "Offen",
+  done: "Erledigt",
+};
 
 const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
@@ -19,7 +25,6 @@ let currentFilter = loadFilter();
 
 render();
 renderVersionInfo();
-updateFilterButtons();
 
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -90,7 +95,6 @@ filterButtons.forEach((button) => {
 
     currentFilter = nextFilter;
     saveFilter();
-    updateFilterButtons();
     render();
   });
 });
@@ -127,6 +131,7 @@ function render() {
   }
 
   updateProgress();
+  updateFilterButtons();
 }
 
 function getVisibleTasks() {
@@ -158,10 +163,25 @@ function getEmptyStateText() {
 }
 
 function updateFilterButtons() {
+  const doneCount = tasks.filter((task) => task.done).length;
+  const openCount = tasks.length - doneCount;
+
+  const counts = {
+    all: tasks.length,
+    open: openCount,
+    done: doneCount,
+  };
+
   filterButtons.forEach((button) => {
-    const isActive = button.dataset.filter === currentFilter;
+    const filter = button.dataset.filter;
+    const isActive = filter === currentFilter;
+
     button.classList.toggle("active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
+
+    const label = FILTER_LABELS[filter] ?? filter;
+    const count = counts[filter] ?? 0;
+    button.textContent = `${label} (${count})`;
   });
 }
 
