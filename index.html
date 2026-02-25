@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Aufgabenliste</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <h1>📝 Mini Aufgabenliste</h1>
+    <p class="subtitle">Deine erste Browser-App mit localStorage</p>
+
+    <form id="task-form" class="task-form">
+      <input
+        id="task-input"
+        type="text"
+        placeholder="Neue Aufgabe eingeben..."
+        autocomplete="off"
+        maxlength="120"
+      />
+      <button type="submit">Hinzufügen</button>
+    </form>
+
+    <p id="error-message" class="error-message" aria-live="polite"></p>
+
+    <section class="status-card">
+      <p id="progress-text">0 von 0 erledigt</p>
+      <button id="clear-done-btn" type="button" class="secondary-btn">
+        Erledigte löschen
+      </button>
+    </section>
+
+    <ul id="task-list" class="task-list" aria-label="Aufgabenliste"></ul>
+
+    <p id="empty-state" class="empty-state">
+      Noch keine Aufgaben. Starte mit deiner ersten ✨
+    </p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
