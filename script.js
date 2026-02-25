@@ -7,10 +7,15 @@ const progressText = document.getElementById("progress-text");
 const emptyState = document.getElementById("empty-state");
 const errorMessage = document.getElementById("error-message");
 const clearDoneBtn = document.getElementById("clear-done-btn");
+const APP_VERSION = "0.1.0";
+const RELEASE_DATE = "2026-02-25 10:30"; // manuell anpassen bei Änderungen
+
+const versionInfo = document.getElementById("app-version-info");
 
 let tasks = loadTasks();
 
 render();
+renderVersionInfo();
 
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -157,4 +162,9 @@ function escapeHtml(text) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+    function renderVersionInfo() {
+  if (!versionInfo) return;
+
+  versionInfo.textContent = `Version ${APP_VERSION} · Stand: ${RELEASE_DATE}`;
+}
 }
