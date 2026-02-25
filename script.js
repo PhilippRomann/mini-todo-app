@@ -1,5 +1,8 @@
 const STORAGE_KEY = "miniTodoApp.tasks";
 
+const APP_VERSION = "0.1.0";
+const RELEASE_DATE = "2026-02-25 10:30"; // bei Änderungen manuell anpassen
+
 const taskForm = document.getElementById("task-form");
 const taskInput = document.getElementById("task-input");
 const taskList = document.getElementById("task-list");
@@ -7,9 +10,6 @@ const progressText = document.getElementById("progress-text");
 const emptyState = document.getElementById("empty-state");
 const errorMessage = document.getElementById("error-message");
 const clearDoneBtn = document.getElementById("clear-done-btn");
-const APP_VERSION = "0.1.0";
-const RELEASE_DATE = "2026-02-25 10:30"; // manuell anpassen bei Änderungen
-
 const versionInfo = document.getElementById("app-version-info");
 
 let tasks = loadTasks();
@@ -155,6 +155,11 @@ function showError(message) {
   errorMessage.textContent = message;
 }
 
+function renderVersionInfo() {
+  if (!versionInfo) return;
+  versionInfo.textContent = `Version ${APP_VERSION} · Stand: ${RELEASE_DATE}`;
+}
+
 function escapeHtml(text) {
   return text
     .replaceAll("&", "&amp;")
@@ -162,9 +167,4 @@ function escapeHtml(text) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-    function renderVersionInfo() {
-  if (!versionInfo) return;
-
-  versionInfo.textContent = `Version ${APP_VERSION} · Stand: ${RELEASE_DATE}`;
-}
 }
