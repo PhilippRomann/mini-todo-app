@@ -110,6 +110,19 @@ h1 {
   border-left: 4px solid #d1d5db;
 }
 
+@media (max-width: 560px) {
+  .task-item {
+    grid-template-columns: auto 1fr auto auto;
+    gap: 8px;
+  }
+
+  .task-item .priority-buttons {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
+}
+
 .task-item.priority-high {
   border-left-color: #dc2626;
 }
